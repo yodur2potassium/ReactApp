@@ -35,6 +35,61 @@ describe('application logic', () => {
         entries: List.of('Casablanca')
       }));
     });
+    it('puts winner of current vote back to entries', () => {
+      const state = Map({
+        vote: Map({
+          pair: List.of('Matrix', 'Casablanca'),
+          tally: Map({
+            'Matrix': 5,
+            'Casablanca': 3
+          })
+        }),
+        entries: List.of('Sunshine', 'Trance', '127 Hours')
+      });
+      const nextState = next(state);
+      expect(nextState).to.equal(Map({
+        vote: Map({
+          pair: List.of('Sunshine', 'Trance'),
+        }),
+        entries: List.of('127 Hours', 'Matrix')
+      }));
+    });
+    it('puts both from tied vote back to entries', () => {
+      const state = Map({
+        vote: Map({
+          pair: List.of('Sunshine', 'Trance'),
+          tally: Map({
+            'Sunshine': 3,
+            'Trance': 3
+          })
+        }),
+        entries: List.of('Matrix', 'Casablanca', '127 Hours')
+      });
+      const nextState = next(state);
+      expect(nextState).to.equal(Map({
+        vote: Map({
+          pair: List.of('Matrix', 'Casablanca'),
+        }),
+        entries: List.of('127 Hours','Sunshine', 'Trance')
+      }));
+    });
+    it('marks winner when just one entry left', () => {
+      const state = Map({
+        vote: Map({
+          pair: List.of('Sunshine', 'Trance'),
+          tally: Map({
+            'Sunshine': 4,
+            'Trance': 3
+          })
+        }),
+        entries: List()
+      });
+      const nextState = next(state);
+      expect(nextState).to.equal(Map({
+        winner: 'Sunshine'
+      }));
+    });
+    // end of describe next()
   });
   describe('vote', () => {
     it('creates a tally for the voted entry', () => {
